@@ -34,11 +34,10 @@ public class TestExtractor {
     @Test
     public void test() throws IOException {
         PropertyConfigurator.configure(TestExtractor.class.getResource("/com/giaybac/traprange/log4j.properties"));
-        String sourceDirectory = "D:\\traprange\\_Docs";
-        String resultDirectory = "D:\\traprange\\_Docs\\result";
         for (int idx = 0; idx < 5; idx++) {
-            PDFTableExtractor extractor = (new PDFTableExtractor())
-                    .setSource(sourceDirectory + File.separator + "sample-" + (idx + 1) + ".pdf");
+            String filename = "sample-" + (idx + 1) + ".pdf";
+			PDFTableExtractor extractor = (new PDFTableExtractor())
+					.setSource(TestExtractor.class.getResourceAsStream(filename));
             switch (idx) {
                 case 0: {
                     extractor.exceptLine(new int[]{0, 1, -1});
@@ -63,7 +62,10 @@ public class TestExtractor {
                 }
             }
             List<Table> tables = extractor.extract();
-            try (Writer writer = new OutputStreamWriter(new FileOutputStream(resultDirectory + "//sample-" + (idx + 1) + ".html"), "UTF-8")) {
+			String resultDirectory = new File(TestExtractor.class.getResource(filename).getFile()).getParent()
+					+ "/result";
+			try (Writer writer = new OutputStreamWriter(
+					new FileOutputStream(resultDirectory + "/sample-" + (idx + 1) + ".html"), "UTF-8")) {
                 for (Table table : tables) {
                     writer.write("Page: " + (table.getPageIdx() + 1) + "\n");
                     writer.write(table.toHtml());
